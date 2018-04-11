@@ -1,0 +1,57 @@
+MSN,Description,Unit
+ARTCB,Asphalt and road oil total consumption.,Billion Btu
+ARTXB,Asphalt and road oil total end-use consumption.,Billion Btu
+AVTCB,Aviation gasoline total consumption.,Billion Btu
+AVTXB,Aviation gasoline total end-use consumption.,Billion Btu
+BMTCB,Biomass total consumption,Billion Btu
+CLTCB,Coal total consumption.,Billion Btu
+CLTXB,Coal total end-use consumption.,Billion Btu
+DFTCB,Distillate fuel oil total consumption.,Billion Btu
+DFTXB,Distillate fuel oil total end-use consumption.,Billion Btu
+EMTCB,"Fuel ethanol, excluding denaturant, total consumption.",Billion Btu
+ESTCB,"Electricity total consumption (i.e., sold).",Billion Btu
+ESTXB,"Electricity total end-use consumption (i.e., sold).",Billion Btu
+FFTCB,"Fossil fuels, total consumption.",Billion Btu
+GETCB,"Geothermal energy, total consumed.",Billion Btu
+GETXB,"Geothermal energy, total end-use consumption.",Billion Btu
+HYTCB,"Hydropower, total consumed.",Billion Btu
+HYTXB,"Hydropower, total end-use consumption.",Billion Btu
+JFTCB,Jet fuel total consumption.,Billion Btu
+JFTXB,Jet fuel total end-use consumption.,Billion Btu
+JKTCB,Kerosene-type jet fuel total consumption.,Billion Btu
+JNTCB,Naphtha-type jet fuel total consumption.,Billion Btu
+KSTCB,Kerosene total consumption.,Billion Btu
+KSTXB,Kerosene total end-use consumption.,Billion Btu
+LGTCB,LPG total consumption.,Billion Btu
+LGTXB,LPG total end-use consumption.,Billion Btu
+LOTCB,Total electrical system energy losses.,Billion Btu
+LOTXB,Total electrical system energy losses allocated to the end-use sectors.,Billion Btu
+LUTCB,Lubricants total consumption.,Billion Btu
+LUTXB,Lubricants total end-use consumption.,Billion Btu
+MGTCB,Motor gasoline total consumption.,Billion Btu
+MGTXB,Motor gasoline total end-use consumption.,Billion Btu
+MMTCB,Motor gasoline total consumption excluding fuel ethanol.,Billion Btu
+NGTCB,Natural gas total consumption (including supplemental gaseous fuels).,Billion Btu
+NGTXB,Natural gas total end-use consumption (including supplemental gaseous fuels).,Billion Btu
+NNTCB,Natural gas total consumption (excluding supplemental gaseous fuels).,Billion Btu
+P1TCB,"Asphalt and road oil, aviation gasoline, kerosene, lubricants, and ""other petroleum products"" total consumption.",Billion Btu
+P1TXB,"Asphalt and road oil, aviation gasoline, kerosene, lubricants, and ""other petroleum products"" total end-use consumption.",Billion Btu
+PATCB,All petroleum products total consumption.,Billion Btu
+PATXB,All petroleum products total end-use consumption.,Billion Btu
+PCTCB,Petroleum coke total consumption.,Billion Btu
+PMTCB,All petroleum products total consumption excluding fuel ethanol.,Billion Btu
+POTCB,Other petroleum products total consumption.,Billion Btu
+POTXB,Other petroleum products total end-use consumption.,Billion Btu
+RETCB,Renewable energy total consumption.,Billion Btu
+RFTCB,Residual fuel oil total consumption.,Billion Btu
+RFTXB,Residual fuel oil total end-use consumption.,Billion Btu
+SFTCB,Supplemental gaseous fuels total consumed.,Billion Btu
+SOTCB,"Solar energy, total consumed.",Billion Btu
+SOTXB,"Solar energy, total end-use consumption.",Billion Btu
+TETCB,Total energy consumption.,Billion Btu
+TETXB,Total end-use energy consumption.,Billion Btu
+TNTXB,Total primary energy and electricity consumed by the end-use sectors.,Billion Btu
+WWTCB,Wood and waste total consumed.,Billion Btu
+WWTXB,Wood and waste total end-use consumption.,Billion Btu
+WYTCB,"Wind energy, total consumed.",Billion Btu
+WYTXB,"Wind energy, total end-use consumption.",Billion Btu
