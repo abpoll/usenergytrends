@@ -16,10 +16,29 @@ import os
 Methods for printing out table for the states
 """
 
+def percent(s):
+    '''
+    changes float series to % string
+    '''
+    columns = ['1990ProportionOfTotalConsumption', 
+               '2015ProportionOfTotalConsumption', 
+               'DifferenceOfProportion']
+    if(s.name in(columns)):
+        s = s.astype(str) + '%'
+    
+    
+
 def highlight_max(s):
     '''
     highlight the maximum in a Series yellow.
     '''
+    columns = ['1990ProportionOfTotalConsumption', 
+               '2015ProportionOfTotalConsumption', 
+               'DifferenceOfProportion']
+    
+    if(s.name in(columns)):
+        s = s.apply(lambda x: x[:-1]).astype(float)
+    
     is_max = s == s.max()
     return ['background-color: yellow' if v else '' for v in is_max]
    
@@ -58,16 +77,14 @@ def make_cons_table(cons_total, codes, msn, pop):
     
     #Add columns for consumption as proportion of total in base, comp, and change of these
     #Total is based on last 3 digits of code. Match that string to get the total into its own sub frame
-    tot_cons = 'TETXB'
-    if(msn[-2:] == 'CB'):
-        tot_cons = 'TETCB'
+    tot_cons = 'TETCB'
     temp_tot = cons_total[cons_total.MSN == tot_cons]
     
     base_tot = temp_tot[temp_tot.Year == 1990].set_index("StateCode")["Data"]
     new_tot = temp_tot[temp_tot.Year == 2015].set_index("StateCode")["Data"]
     
-    test_df['1990ProportionOfTotalConsumption'] = (base/base_tot).values
-    test_df['2015ProportionOfTotalConsumption'] = (new/new_tot).values
+    test_df['1990ProportionOfTotalConsumption'] = 100 * (base/base_tot).values
+    test_df['2015ProportionOfTotalConsumption'] = 100 * (new/new_tot).values
     test_df['DifferenceOfProportion'] = (test_df['2015ProportionOfTotalConsumption'] - 
                                          test_df['1990ProportionOfTotalConsumption']).values
     
@@ -86,23 +103,30 @@ def make_cons_table(cons_total, codes, msn, pop):
     test_df.iloc[-1] = target_row.squeeze()
     test_df = test_df.drop(test_df.index[42])
     
-    plot_cons_table(test_df, tot_cons, msn)
+    
+    return test_df
 
-def plot_cons_table(consumption, tot_cons, msn):
+def plot_cons_table(consumption, msn):
     
     ##Want to format the consumption table more
     #highlight max in each column for starters
     #better float handling
     
-    dest = "./consumption_tables/" + codes.loc[tot_cons].to_string(index=False).replace("\n", "_") + "/"
+    dest = "./consumption_tables/" + codes.loc['TETCB'].to_string(index=False).replace("\n", "_") + "/"
     csv = ".csv"
     
     if not os.path.exists(dest):
         os.makedirs(dest, exist_ok=True)
     
     title = (codes.loc[msn].to_string(index=False)).replace("\n", "_")
-    
+
+
     consumption.to_csv(dest+title+csv, float_format='%g')
+    
+    consumption['1990ProportionOfTotalConsumption'] = consumption['1990ProportionOfTotalConsumption'].astype(str) + '%'
+    consumption['2015ProportionOfTotalConsumption'] = consumption['2015ProportionOfTotalConsumption'].astype(str) + '%'
+    consumption['DifferenceOfProportion'] = consumption['DifferenceOfProportion'].astype(str) + '%'
+    
     
     ##might turn into method for writing out the tables this way
     consumption.style.\
@@ -125,11 +149,12 @@ Going forward, Final End Use not considered
 """
 #total consumption rows, butane units only
 state_cons_total = state_cons[state_cons.MSN.str.contains("TCB$")]
+#state_cons_total.to_csv("./data/Complete_SEDS.csv") overwrote original file
 
 #total final consumption rows, butane units only
 #state_final_cons_total = state_cons[state_cons.MSN.str.contains("TXB$")]
 
-#1990 and 2015 only for comparisons
+#1990 and 2015 only for consumption comparisons
 sct = state_cons_total[(state_cons_total.Year == 1990) | (state_cons_total.Year == 2015)]
 #sfct = state_final_cons_total[(state_final_cons_total.Year == 1990) | (state_final_cons_total.Year == 2015)]
 
@@ -144,7 +169,7 @@ Merge the code descriptions to MSN codes
 ##Map MSN to its full phrase
 codes = pd.read_csv("./data/Codes_and_Descriptions.csv", header =9)[['MSN', 'Description', 'Unit']]
 codes = codes[pd.notnull(codes.MSN)]
-codes = codes[codes.MSN.str.contains("TCB$|TXB$")]
+codes = codes[codes.MSN.str.contains("TCB$")]
 
 
 sct = pd.merge(sct, codes, on = 'MSN')
@@ -196,5 +221,20 @@ codes_output = ('BMTCB', 'CLTCB', 'ESTCB', 'FFTCB', 'GETCB', 'HYTCB',
                 'NGTCB', 'PATCB', 'RETCB', 'SOTCB', 'WYTCB')
 
 for c in codes_output:
-    make_cons_table(sct, codes, c, pop)
+   temp =  make_cons_table(sct, codes, c, pop)
+   plot_cons_table(temp, c)
 
+
+"""
+Exploration analysis using a sample code
+Note: Why is some proportion greater than 100??? 
+"""
+
+temp = make_cons_table(sct, codes, 'FFTCB', pop)
+bound = temp.DifferenceOfProportion.abs().describe()['75%']
+temp = temp[temp.DifferenceOfProportion.abs() >= bound]
+temp = temp.reindex(temp.DifferenceOfProportion.abs().sort_values(ascending=False).index)
+
+
+#temp.reindex(temp.DifferenceOfProportion.abs().sort_values(ascending=False).index)
+#temp.DifferenceOfProportion.abs().describe()
