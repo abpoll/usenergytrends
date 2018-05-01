@@ -282,6 +282,62 @@ ren.loc[(ren['90POL'] == 'DEM') & (ren['15POL'] == 'DEM'), 'POL_GROUP'] = 'DEM_D
 #do top 25% of largest shifters for plotting
 
 #Plotting is going to be tricky. Have to think about best way to do this
+temp = ren[ren.POL_GROUP == 'REP_REP']
+#bound = temp.DifferenceOfProportion.abs().describe()['75%']
+#temp = temp[temp.DifferenceOfProportion.abs() >= bound]
 
-bound = temp.DifferenceOfProportion.abs().describe()['75%']
-temp = temp[temp.DifferenceOfProportion.abs() >= bound]
+# Setting the positions and width for the bars
+pos = list(range(len(temp))) 
+width = 0.25 
+    
+# Plotting the bars
+fig, ax = plt.subplots(figsize=(10,5))
+
+# Create a bar with 1990 data,
+# in position pos,
+plt.bar(pos, 
+        #using df['pre_score'] data,
+        temp['1990ProportionOfTotalConsumption'], 
+        # of width
+        width, 
+        # with alpha 0.5
+        alpha=0.5, 
+        # with color
+        color='#EE3224', 
+        
+        ) 
+
+# Create a bar with 2015 data,
+# in position pos + some width buffer,
+plt.bar([p + width for p in pos], 
+        #using df['mid_score'] data,
+        temp['2015ProportionOfTotalConsumption'],
+        # of width
+        width, 
+        # with alpha 0.5
+        alpha=0.5, 
+        # with color
+        color='#F78F1E', 
+       
+        )
+
+# Set the y axis label
+ax.set_ylabel('ProportionOfTotalConsumption')
+
+# Set the chart's title
+ax.set_title('1992 Republican & 2016 Republican Big Shift States Renewable Energy')
+
+# Set the position of the x ticks
+ax.set_xticks([p + .5 * width for p in pos])
+
+# Set the labels for the x ticks
+ax.set_xticklabels(temp['StateCode'])
+
+# Setting the x-axis and y-axis limits
+plt.xlim(min(pos)-width, max(pos)+width*4)
+plt.ylim([0, 100])
+
+# Adding the legend and showing the plot
+plt.legend(['1990', '2015'], loc='upper left')
+plt.grid()
+plt.show()
