@@ -99,9 +99,7 @@ def make_cons_table(cons_total, codes, msn, pop):
     
     ##US is index 43. Want to move to bottom of data frame
     target_row = test_df.iloc[[43],:]
-    test_df = test_df.shift(-1)
-    test_df.iloc[-1] = target_row.squeeze()
-    test_df = test_df.drop(test_df.index[42])
+    test_df = test_df.drop(test_df.index[43]).append(target_row)
     
     
     return test_df
@@ -238,3 +236,52 @@ temp = temp.reindex(temp.DifferenceOfProportion.abs().sort_values(ascending=Fals
 
 #temp.reindex(temp.DifferenceOfProportion.abs().sort_values(ascending=False).index)
 #temp.DifferenceOfProportion.abs().describe()
+
+
+"""
+For renewable RETCB, make composition charts
+First, add political data field that says Rep-Rep, Rep-Dem, etc. as a category
+Then, for each category, we get an x-axis, with the stacked bar composed of %renewable 1990, %renewable2015
+One issue with this is the actual making of the plot. I don't know how to have plot-tick groups
+What I mean by this is that %1990 and %2015 is a stacked bar with 1-% on top
+How do I repeat these labels so we have 8 of them, and they're grouped into 4 categories? 
+Better idea - different plot for each group since there will be a lot of state names
+And, it might be so crowded that for each group there should be a cutoff of states shown. 
+Maybe, if size >= 4, choose top 25% shifters and display
+If < 4, show all
+"""
+
+#renewable cons_table store
+ren = make_cons_table(sct, codes, 'RETCB', pop)
+
+#read in 92 and 16 election data
+elec_92 = pd.read_csv("./data/92Election.csv")
+elec_16 = pd.read_csv("./data/16Election.csv")
+
+#Process data to add Rep/Dem labels
+elec_92.loc[elec_92.EV_D.isnull(), '90POL'] = 'REP'
+elec_92.loc[~elec_92.EV_D.isnull(), '90POL'] = 'DEM'
+
+elec_16.loc[elec_16.EV_D.isnull(), '15POL'] = 'REP'
+elec_16.loc[~elec_16.EV_D.isnull(), '15POL'] = 'DEM'
+
+#Make elec df
+elec = elec_92[['STATE', '90POL']].merge(elec_16[['STATE', '15POL']], 
+                                          on='STATE', how='inner')
+
+#Update cons_table with political data
+ren = ren.merge(elec, left_on='StateCode', right_on='STATE', how='inner').drop(columns=['STATE'])
+
+#Add category column
+ren.loc[(ren['90POL'] == 'REP') & (ren['15POL'] == 'REP'), 'POL_GROUP'] = 'REP_REP'
+ren.loc[(ren['90POL'] == 'DEM') & (ren['15POL'] == 'REP'), 'POL_GROUP'] = 'DEM_REP'
+ren.loc[(ren['90POL'] == 'REP') & (ren['15POL'] == 'DEM'), 'POL_GROUP'] = 'REP_DEM'
+ren.loc[(ren['90POL'] == 'DEM') & (ren['15POL'] == 'DEM'), 'POL_GROUP'] = 'DEM_DEM'
+
+#As a note, the REP_DEM group has only 1 state. The others >= 4, so can 
+#do top 25% of largest shifters for plotting
+
+#Plotting is going to be tricky. Have to think about best way to do this
+
+bound = temp.DifferenceOfProportion.abs().describe()['75%']
+temp = temp[temp.DifferenceOfProportion.abs() >= bound]
