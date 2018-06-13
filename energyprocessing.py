@@ -134,6 +134,120 @@ def plot_cons_table(consumption, msn):
     
     
     
+def horizontal_state_charts(cons):
+    fig, ax = plt.subplots(nrows=2, ncols=2, figsize=(10,10))
+    
+    rep_rep = cons[cons.POL_GROUP == 'REP_REP']
+    rep_rep = rep_rep[rep_rep.DifferenceOfProportion > rep_rep.DifferenceOfProportion.quantile(.75)].append(cons[cons.StateCode == 'US'])
+    
+    rep_dem = cons[cons.POL_GROUP == 'REP_DEM'].append(cons[cons.StateCode == 'US'])
+    
+    dem_rep = cons[cons.POL_GROUP == 'DEM_REP'].append(cons[cons.StateCode == 'US'])
+    dem_rep = dem_rep[dem_rep.DifferenceOfProportion > dem_rep.DifferenceOfProportion.quantile(.75)].append(cons[cons.StateCode == 'US'])
+    
+    dem_dem = cons[cons.POL_GROUP == 'DEM_DEM'].append(cons[cons.StateCode == 'US'])
+    dem_dem = dem_dem[dem_dem.DifferenceOfProportion > dem_dem.DifferenceOfProportion.quantile(.75)].append(cons[cons.StateCode == 'US'])
+    
+    width = .25
+    
+    pos_rep_rep = list(range(len(rep_rep)))
+    
+    ax[0,0].barh(pos_rep_rep,
+                 rep_rep['1990ProportionOfTotalConsumption'],
+                 width,
+                 alpha=.5,
+                 color='#EE3224')
+    ax[0,0].barh([p + width for p in pos_rep_rep],
+                  rep_rep['2015ProportionOfTotalConsumption'],
+                  width,
+                  alpha=.5,
+                  color='#F78F1E')
+    ax[0,0].set_ylabel('States')
+    
+    ax[0,0].set_title('1992 and 2016 Rep')
+  
+    ax[0,0].set_yticks([p + .5 * width for p in pos_rep_rep])
+    
+    ax[0,0].set_yticklabels(rep_rep['StateCode'])
+    
+    ax[0,0].set_ylim([min(pos_rep_rep)-width, max(pos_rep_rep)+width*4])
+    ax[0,0].set_xlim([0, 100])
+    
+    pos_dem_dem = list(range(len(dem_dem)))
+    
+    ax[1,1].barh(pos_dem_dem,
+                 dem_dem['1990ProportionOfTotalConsumption'],
+                 width,
+                 alpha=.5,
+                 color='#EE3224')
+    ax[1,1].barh([p + width for p in pos_dem_dem],
+                  dem_dem['2015ProportionOfTotalConsumption'],
+                  width,
+                  alpha=.5,
+                  color='#F78F1E')
+    ax[1,1].set_ylabel('States')
+    
+    ax[1,1].set_title('1992 and 2016 Dem')
+  
+    ax[1,1].set_yticks([p + .5 * width for p in pos_dem_dem])
+    
+    ax[1,1].set_yticklabels(dem_dem['StateCode'])
+    
+    ax[1,1].set_ylim([min(pos_dem_dem)-width, max(pos_dem_dem)+width*4])
+    ax[1,1].set_xlim([0, 100])
+    
+    pos_dem_rep = list(range(len(dem_rep)))
+    
+    ax[1,0].barh(pos_dem_rep,
+                 dem_rep['1990ProportionOfTotalConsumption'],
+                 width,
+                 alpha=.5,
+                 color='#EE3224')
+    ax[1,0].barh([p + width for p in pos_dem_rep],
+                  dem_rep['2015ProportionOfTotalConsumption'],
+                  width,
+                  alpha=.5,
+                  color='#F78F1E')
+    ax[1,0].set_ylabel('States')
+    
+    ax[1,0].set_title('1992 Dem, 2016 Rep')
+  
+    ax[1,0].set_yticks([p + .5 * width for p in pos_dem_rep])
+    
+    ax[1,0].set_yticklabels(dem_rep['StateCode'])
+    
+    ax[1,0].set_ylim([min(pos_dem_rep)-width, max(pos_dem_rep)+width*4])
+    ax[1,0].set_xlim([0, 100])
+ 
+    pos_rep_dem = list(range(len(rep_dem)))
+    
+    ax[0,1].barh(pos_rep_dem,
+                 rep_dem['1990ProportionOfTotalConsumption'],
+                 width,
+                 alpha=.5,
+                 color='#EE3224')
+    ax[0,1].barh([p + width for p in pos_rep_dem],
+                  rep_dem['2015ProportionOfTotalConsumption'],
+                  width,
+                  alpha=.5,
+                  color='#F78F1E')
+    ax[0,1].set_ylabel('States')
+    
+    ax[0,1].set_title('1992 Rep, 2016 Dem')
+  
+    ax[0,1].set_yticks([p + .5 * width for p in pos_rep_dem])
+    
+    ax[0,1].set_yticklabels(rep_dem['StateCode'])
+    
+    
+    ax[0,1].set_ylim([min(pos_rep_dem)-width, max(pos_rep_dem)+width*4])
+    ax[0,1].set_xlim([0, 100])
+    ax[0,1].legend(loc='upper right')
+    
+    ax[0,1].legend(['1990', '2015'], loc='upper right')
+    plt.suptitle('Top Renewable Energy Proportion of Total Consumption Shifters',
+                 fontsize=14)
+    
 """
 Read in the SEDS data
 """
@@ -270,7 +384,7 @@ elec = elec_92[['STATE', '90POL']].merge(elec_16[['STATE', '15POL']],
                                           on='STATE', how='inner')
 
 #Update cons_table with political data
-ren = ren.merge(elec, left_on='StateCode', right_on='STATE', how='inner').drop(columns=['STATE'])
+ren = ren.merge(elec, left_on='StateCode', right_on='STATE', how='left').drop(columns=['STATE'])
 
 #Add category column
 ren.loc[(ren['90POL'] == 'REP') & (ren['15POL'] == 'REP'), 'POL_GROUP'] = 'REP_REP'
@@ -291,11 +405,11 @@ pos = list(range(len(temp)))
 width = 0.25 
     
 # Plotting the bars
-fig, ax = plt.subplots(figsize=(10,5))
+fig, ax = plt.subplots(figsize=(5,8))
 
 # Create a bar with 1990 data,
 # in position pos,
-plt.bar(pos, 
+plt.barh(pos, 
         #using df['pre_score'] data,
         temp['1990ProportionOfTotalConsumption'], 
         # of width
@@ -309,7 +423,7 @@ plt.bar(pos,
 
 # Create a bar with 2015 data,
 # in position pos + some width buffer,
-plt.bar([p + width for p in pos], 
+plt.barh([p + width for p in pos], 
         #using df['mid_score'] data,
         temp['2015ProportionOfTotalConsumption'],
         # of width
@@ -322,22 +436,54 @@ plt.bar([p + width for p in pos],
         )
 
 # Set the y axis label
-ax.set_ylabel('ProportionOfTotalConsumption')
+ax.set_ylabel('States')
 
 # Set the chart's title
-ax.set_title('1992 Republican & 2016 Republican Big Shift States Renewable Energy')
+ax.set_title('1992 Republican & 2016 Republican Renewable Energy Proportion of Total Energy Consumption')
 
 # Set the position of the x ticks
-ax.set_xticks([p + .5 * width for p in pos])
+ax.set_yticks([p + .5 * width for p in pos])
 
 # Set the labels for the x ticks
-ax.set_xticklabels(temp['StateCode'])
+ax.set_yticklabels(temp['StateCode'])
 
 # Setting the x-axis and y-axis limits
-plt.xlim(min(pos)-width, max(pos)+width*4)
-plt.ylim([0, 100])
+plt.ylim(min(pos)-width, max(pos)+width*4)
+plt.xlim([0, 100])
 
 # Adding the legend and showing the plot
-plt.legend(['1990', '2015'], loc='upper left')
+plt.legend(['1990', '2015'], loc='upper right')
 plt.grid()
 plt.show()
+
+
+##Review and implement for all energy types
+import seaborn as sns
+tips = sns.load_dataset("tips")
+tips.head()
+sns.barplot(x="DifferenceOfProportion", y="StateCode", hue="POL_GROUP", data=cons)
+ax = sns.barplot(x="DifferenceOfProportion", y="StateCode", hue="POL_GROUP", data=cons)
+fig, ax = plt.subplots(figsize=(10,10));\
+ax = sns.barplot(x="DifferenceOfProportion", y="StateCode", hue="POL_GROUP", data=cons)
+temp = cons[abs(cons.DifferenceOfProportion) > abs(cons[cons.StateCode=='US'].DifferenceOfProportion])]
+temp = cons[abs(cons.DifferenceOfProportion) > abs(cons[cons.StateCode=='US'].DifferenceOfProportion)]
+abs(cons[cons.StateCode=='US'].DifferenceOfProportion)
+lim = abs(cons[cons.StateCode=='US'].DifferenceOfProportion)
+temp = cons[abs(cons.DifferenceOfProportion) > lim.value ]
+lim
+lim.val
+lim.value
+lim.DifferenceOfProportion
+temp = cons[abs(cons.DifferenceOfProportion) > lim]
+lim.reset_index()
+temp = cons[abs(cons.DifferenceOfProportion) > lim[0]]
+temp = cons[abs(cons.DifferenceOfProportion) > lim.reset_index().DifferenceOfProportion]
+abs(cons.DiffernceOfProportion)
+abs(cons.DifferenceOfProportion)
+lim.reset_index().DifferenceOfProportion
+lim.reset_index().DifferenceOfProportion[0]
+temp = cons[abs(cons.DifferenceOfProportion) > lim.reset_index().DifferenceOfProportion[0]]
+len(temp)
+ax = sns.barplot(x="DifferenceOfProportion", y="StateCode", hue="POL_GROUP", data=temp)
+temp_out = cons[~cons.StateCode.isin(temp.StateCode)]
+ax = sns.barplot(x="DifferenceOfProportion", y="StateCode", hue="POL_GROUP", data=temp_out)
