@@ -459,31 +459,26 @@ plt.show()
 
 ##Review and implement for all energy types
 import seaborn as sns
-tips = sns.load_dataset("tips")
-tips.head()
-sns.barplot(x="DifferenceOfProportion", y="StateCode", hue="POL_GROUP", data=cons)
-ax = sns.barplot(x="DifferenceOfProportion", y="StateCode", hue="POL_GROUP", data=cons)
-fig, ax = plt.subplots(figsize=(10,10));\
-ax = sns.barplot(x="DifferenceOfProportion", y="StateCode", hue="POL_GROUP", data=cons)
-temp = cons[abs(cons.DifferenceOfProportion) > abs(cons[cons.StateCode=='US'].DifferenceOfProportion])]
-temp = cons[abs(cons.DifferenceOfProportion) > abs(cons[cons.StateCode=='US'].DifferenceOfProportion)]
-abs(cons[cons.StateCode=='US'].DifferenceOfProportion)
-lim = abs(cons[cons.StateCode=='US'].DifferenceOfProportion)
-temp = cons[abs(cons.DifferenceOfProportion) > lim.value ]
-lim
-lim.val
-lim.value
-lim.DifferenceOfProportion
+
+cons = ren.copy()
+
+
+lim = abs(cons[cons.StateCode=='US'].DifferenceOfProportion).iloc[0]
+
 temp = cons[abs(cons.DifferenceOfProportion) > lim]
-lim.reset_index()
-temp = cons[abs(cons.DifferenceOfProportion) > lim[0]]
-temp = cons[abs(cons.DifferenceOfProportion) > lim.reset_index().DifferenceOfProportion]
-abs(cons.DiffernceOfProportion)
-abs(cons.DifferenceOfProportion)
-lim.reset_index().DifferenceOfProportion
-lim.reset_index().DifferenceOfProportion[0]
-temp = cons[abs(cons.DifferenceOfProportion) > lim.reset_index().DifferenceOfProportion[0]]
-len(temp)
-ax = sns.barplot(x="DifferenceOfProportion", y="StateCode", hue="POL_GROUP", data=temp)
-temp_out = cons[~cons.StateCode.isin(temp.StateCode)]
-ax = sns.barplot(x="DifferenceOfProportion", y="StateCode", hue="POL_GROUP", data=temp_out)
+temp_out = cons[abs(cons.DifferenceOfProportion) < lim]
+
+
+fig, ax = plt.subplots(nrows=1, ncols=2, figsize=(10,10))
+
+palette ={"DEM_DEM":"blue","DEM_REP":"lightblue","REP_DEM":"palevioletred", "REP_REP":"red"}
+
+sns.barplot(ax=ax[0],x="DifferenceOfProportion", y="StateCode", hue="POL_GROUP", data=temp, 
+                 palette=palette, hue_order=['DEM_DEM', 'DEM_REP', 'REP_DEM', 'REP_REP'],
+                 dodge=False).set_title("Big Shifters")
+                 
+
+sns.barplot(ax=ax[1],x="DifferenceOfProportion", y="StateCode", hue="POL_GROUP", data=temp_out, 
+                 palette = palette, hue_order=['DEM_DEM', 'DEM_REP', 'REP_DEM', 'REP_REP'],
+                 dodge=False).set_title("Small Shifters")
+      
